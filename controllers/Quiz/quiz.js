@@ -1,4 +1,5 @@
 import fs from "fs";
+import mongoose from "mongoose";
 
 import Quiz from "../../models/quiz.js";
 import { generateQuiz, generateRealTest, gradeQuiz } from "./helpers.js";
@@ -18,51 +19,63 @@ const getCourseKey = (course) => {
   }
 };
 
-export const getQuiz = (req, res, next) => {
-  const key = getCourseKey(req.params.course);
+export const getQuiz = async (req, res, next) => {
+  const quizId = req.params.quizId;
 
   try {
-    fs.readFile(FILE_URL, (error, data) => {
-      if (error) throw error;
-      const questionsArr = JSON.parse(data);
-      if (key) {
-        const questions = questionsArr[key];
-        return res.json({
-          key: key,
-          quiz: {
-            [key]: generateQuiz(questions),
-          },
-        });
-      }
+    const quiz = await Quiz.findById(quizId);
 
-      res.json({
-        key: "real test",
-        quiz: generateRealTest(3, questionsArr, 4, 8),
-      });
+    if (!quiz) {
+      throw new Error("This quiz does not exist.");
+    }
+
+    if (quiz.questions.length === 0) {
+      throw new Error("There are no questions for this quiz yet.");
+    }
+
+    const quizQuestions = generateQuiz(quiz.questions, quiz.numOfQuestions);
+    // fs.readFile(FILE_URL, (error, data) => {
+    //   if (error) throw error;
+    //   const questionsArr = JSON.parse(data);
+    //   if (key) {
+    //     const questions = questionsArr[key];
+    //     return res.json({
+    //       key: key,
+    //       quiz: {
+    //         [key]: generateQuiz(questions),
+    //       },
+    //     });
+    //   }
+
+    res.json({
+      quiz: {
+        _id: quiz._id,
+        slug: quiz.slug,
+        color: quiz.color,
+        questions: quizQuestions,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-export const verifyQuiz = (req, res, next) => {
+export const verifyQuiz = async (req, res, next) => {
   const userQuizData = req.body;
-  console.log(userQuizData);
-  try {
-    fs.readFile(FILE_URL, (error, data) => {
-      if (error) throw error;
-      const questionsArr = JSON.parse(data);
 
-      res.json({ result: gradeQuiz(questionsArr, userQuizData) });
-    });
+  try {
+    const quiz = await Quiz.findById(userQuizData.quizId).lean();
+
+    res.json({ result: gradeQuiz(quiz.questions, userQuizData) });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
 
 export const getQuizInfos = async (req, res, next) => {
   try {
-    const quizes = await Quiz.find({});
+    const quizes = await Quiz.find({}, "-questions");
 
     res.json({
       quizes,
@@ -84,6 +97,30 @@ export const viewData = (req, res, next) => {
         data: questionsArr[spec],
       });
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const moveData = async (req, res, next) => {
+  try {
+    const rawData = fs.readFileSync(FILE_URL);
+    const data = JSON.parse(rawData);
+    data["RET"].forEach((entry) => {
+      entry.mainText = entry.question;
+      entry._id = entry.id;
+      delete entry.question;
+      delete entry.id;
+    });
+    const quiz = await Quiz.findById("6076b6397d62ec2ac41c40b6");
+    quiz.questions = data["RET"];
+    const finalQuiz = await Quiz.findByIdAndUpdate(
+      "6076b6397d62ec2ac41c40b6",
+      quiz
+    );
+    // console.log(quiz.questions[1]);
+    // quiz.questions.forEach((question) => (question.newProperty = "TEEEEST"));
+    res.json(quiz.questions);
   } catch (error) {
     next(error);
   }

@@ -6,8 +6,8 @@ import cors from "cors";
 import helmet from "helmet";
 
 import { notFound, errorHandler } from "./errorHandler.js";
-import { checkUserToken } from "./middleware/auth.js";
-import userRouter from "./routes/auth.js";
+import { checkUserToken, checkAdminToken } from "./middleware/auth.js";
+import userRouter from "./routes/user.js";
 import quizRouter from "./routes/quiz.js";
 import adminRouter from "./routes/admin.js";
 import communityRouter from "./routes/community.js";
@@ -30,9 +30,9 @@ await mongoose.connect(process.env.MONGO_URL, {
 });
 
 app.use("/user", userRouter);
-app.use("/quiz", checkUserToken, quizRouter);
-app.use("/topics", checkUserToken, communityRouter);
-app.use("/admin", adminRouter);
+app.use("/quiz", quizRouter);
+app.use("/community", checkUserToken, communityRouter);
+app.use("/admin", checkAdminToken, adminRouter);
 
 app.use(notFound);
 app.use(errorHandler);
