@@ -6,7 +6,7 @@ import {
   toggleTopicLock,
   updateTopic,
 } from "../controllers/Admin/community.js";
-import { createQuiz } from "../controllers/Admin/quizes.js";
+import { createQuiz } from "../controllers/admin/quizes.js";
 import { uploadTopicImage, uploadQuizImage } from "../fileUpload.js";
 
 const router = express.Router();

@@ -9,6 +9,7 @@ const PostSchema = mongoose.Schema({
     trim: true,
   },
   content: String,
+  questionContent: {},
   color: String,
   topic: {
     _id: mongoose.Schema.Types.ObjectId,

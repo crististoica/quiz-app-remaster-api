@@ -2,6 +2,7 @@ import fs from "fs";
 import mongoose from "mongoose";
 
 import Quiz from "../../models/quiz.js";
+import Topic from "../../models/topic.js";
 import { generateQuiz, generateRealTest, gradeQuiz } from "./helpers.js";
 
 const FILE_URL = "./data-remaster-v3.json";
@@ -65,8 +66,9 @@ export const verifyQuiz = async (req, res, next) => {
 
   try {
     const quiz = await Quiz.findById(userQuizData.quizId).lean();
+    const topic = await Topic.findById(quiz.topic, "isForQuiz isLocked posts");
 
-    res.json({ result: gradeQuiz(quiz.questions, userQuizData) });
+    res.json({ result: gradeQuiz(quiz.questions, userQuizData), topic });
   } catch (error) {
     console.log(error);
     next(error);

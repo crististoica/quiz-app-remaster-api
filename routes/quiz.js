@@ -6,7 +6,7 @@ import {
   getQuizInfos,
   viewData,
   moveData,
-} from "../controllers/Quiz/quiz.js";
+} from "../controllers/quiz/quiz.js";
 
 const router = express.Router();
 

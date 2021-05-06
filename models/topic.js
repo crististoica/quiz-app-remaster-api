@@ -22,6 +22,7 @@ const TopicSchema = mongoose.Schema({
         name: String,
         profileImg: String,
       },
+      questionId: String,
       slug: String,
       title: String,
       createdOn: Date,

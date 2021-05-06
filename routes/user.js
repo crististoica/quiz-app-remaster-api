@@ -5,7 +5,7 @@ import {
   signin,
   checkToken,
   changeProfileImg,
-} from "../controllers/User/user.js";
+} from "../controllers/user/user.js";
 import { checkUserToken } from "../middleware/auth.js";
 import { uploadProfileImage, uploadQuizImage } from "../fileUpload.js";
 
