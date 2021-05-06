@@ -1,16 +1,21 @@
 import Topic from "../../models/topic.js";
 import Quiz from "../../models/quiz.js";
+import Post from "../../models/post.js";
 import fs from "fs";
+import slugify from "slugify";
 
 export const createTopic = async (req, res, next) => {
   const topicInfos = {
     name: req.body.name,
     color: req.body.color,
     img: req.file.path.replace("public\\", ""),
-    url: req.body.name.toLowerCase().split(" ").join("-"),
+    slug: slugify(req.body.name, { lower: true, strict: true }),
   };
 
   try {
+    if (!topicInfos.name) {
+      throw new Error("Name is Required.");
+    }
     const topic = new Topic(topicInfos);
     await topic.save();
 
@@ -28,6 +33,7 @@ export const removeTopic = async (req, res, next) => {
 
   try {
     const topic = await Topic.findByIdAndDelete(topicId);
+    await Post.remove({ "topic._id": topicId });
     if (topic.isForQuiz) {
       await Quiz.findByIdAndDelete(topic.quiz);
     }

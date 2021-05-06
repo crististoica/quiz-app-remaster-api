@@ -8,7 +8,7 @@ export const generateQuiz = (data, numOfQuestions = 9) => {
     indexesArr.add(data[index]);
   }
 
-  return Array.from(indexesArr);
+  return Array.from(indexesArr).sort();
 };
 
 export const generateRealTest = (n, data, min, max) => {
@@ -50,31 +50,29 @@ export const generateRealTest = (n, data, min, max) => {
 };
 
 export const gradeQuiz = (data, userQuizData) => {
-  const result = {
-    entries: {},
-  };
+  const userAnswers = userQuizData.userAnswers;
+  const questions = [];
 
-  Object.keys(userQuizData.userAnswers).forEach((key) => {
-    let correctAnswers = 0;
-    result.entries[key] = {
-      data: [
-        ...userQuizData.userAnswers[key].map((entry) => {
-          if (entry.userAnswer === data[key][entry.index].correctAnswer) {
-            correctAnswers++;
-          }
-          return {
-            ...data[key][entry.index],
-            userAnswer: entry.userAnswer,
-            answeredCorrectly:
-              entry.userAnswer === data[key][entry.index].correctAnswer,
-          };
-        }),
-      ],
-
-      score: correctAnswers,
-    };
+  userAnswers.forEach((answer) => {
+    questions.push(data[answer.questionIndex]);
   });
 
+  let correctAnswers = 0;
+  questions.forEach((question, index) => {
+    question.userAnswer = userAnswers[index].userAnswer;
+
+    if (question.correctAnswer === userAnswers[index].userAnswer) {
+      correctAnswers++;
+    }
+    question.answeredCorrectly =
+      question.correctAnswer === userAnswers[index].userAnswer;
+  });
+
+  const result = {
+    data: questions,
+  };
+
+  result.score = correctAnswers;
   result.time = userQuizData.time;
   result.date = userQuizData.date;
   result.color = userQuizData.color;

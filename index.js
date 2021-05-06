@@ -4,15 +4,27 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import { notFound, errorHandler } from "./errorHandler.js";
-import { checkUserToken } from "./middleware/auth.js";
-import userRouter from "./routes/auth.js";
+import { checkUserToken, checkAdminToken } from "./middleware/auth.js";
+import userRouter from "./routes/user.js";
 import quizRouter from "./routes/quiz.js";
 import adminRouter from "./routes/admin.js";
 import communityRouter from "./routes/community.js";
 
 const app = express();
+const userLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: {
+    message: {
+      content: "Too many requests. Try again in 15 minutes.",
+      type: "error",
+    },
+  },
+});
+
 dotenv.config();
 
 app.use(helmet());
@@ -22,6 +34,8 @@ app.use(express.json({ extended: true, limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+app.set("trust proxy", 1);
+
 await mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -29,10 +43,10 @@ await mongoose.connect(process.env.MONGO_URL, {
   useCreateIndex: true,
 });
 
-app.use("/user", userRouter);
+app.use("/user", userLimiter, userRouter);
 app.use("/quiz", checkUserToken, quizRouter);
-app.use("/topics", checkUserToken, communityRouter);
-app.use("/admin", adminRouter);
+app.use("/community", checkUserToken, communityRouter);
+app.use("/admin", checkAdminToken, adminRouter);
 
 app.use(notFound);
 app.use(errorHandler);

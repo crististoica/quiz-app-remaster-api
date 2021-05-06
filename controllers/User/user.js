@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sharp from "sharp";
+import fs from "fs";
 
-import User from "../models/user.js";
+import User from "../../models/user.js";
 
 export const signup = async (req, res, next) => {
   const userInfo = req.body;
@@ -24,6 +26,9 @@ export const signup = async (req, res, next) => {
       {
         _id: newUser._id,
         firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        profileImg: newUser.profileImg,
+        isAdmin: newUser.isAdmin,
       },
       process.env.JWT_SECRET,
       {
@@ -60,6 +65,8 @@ export const signin = async (req, res, next) => {
             _id: existingUser._id,
             firstName: existingUser.firstName,
             lastName: existingUser.lastName,
+            profileImg: existingUser.profileImg,
+            isAdmin: existingUser.isAdmin,
           },
           process.env.JWT_SECRET,
           {
@@ -69,7 +76,13 @@ export const signin = async (req, res, next) => {
 
         return res.json({
           token,
-          userData: existingUser,
+          userData: {
+            _id: existingUser._id,
+            firstName: existingUser.firstName,
+            lastName: existingUser.lastName,
+            profileImg: existingUser.profileImg,
+            isAdmin: existingUser.isAdmin,
+          },
         });
       }
     }
@@ -79,6 +92,29 @@ export const signin = async (req, res, next) => {
   }
 };
 
+export const changeProfileImg = async (req, res, next) => {
+  const path = req.file.path;
+  const userId = req.userData._id;
+
+  const image = await sharp(path)
+    .resize(200, 200)
+    .png()
+    .toFile(`public/uploads/profiles/${userId}.png`);
+
+  await User.findByIdAndUpdate(userId, {
+    profileImg: `uploads/profiles/${userId}.png`,
+  });
+
+  fs.unlink(path, (err) => {
+    if (err) throw new Error(err);
+
+    res.json({
+      message: "Profile Image Updated.",
+    });
+  });
+};
+
 export const checkToken = (req, res) => {
+  console.log(req.userData);
   res.json(req.userData);
 };

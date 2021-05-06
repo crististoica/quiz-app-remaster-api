@@ -1,6 +1,6 @@
 import Quiz from "../../models/quiz.js";
 import Topic from "../../models/topic.js";
-import fs from "fs";
+import slugify from "slugify";
 
 export const createQuiz = async (req, res, next) => {
   try {
@@ -11,14 +11,14 @@ export const createQuiz = async (req, res, next) => {
     const quizInfos = {
       ...req.body,
       img: req.file.path.replace("public\\", ""),
-      url: req.body.name.toLowerCase().split(" ").join("-"),
+      slug: slugify(req.body.name, { lower: true, strict: true }),
     };
 
     const topicInfos = {
       name: req.body.name,
       color: req.body.color,
       img: req.file.path.replace("public\\", ""),
-      url: req.body.name.toLowerCase().split(" ").join("-"),
+      slug: slugify(req.body.name, { lower: true, strict: true }),
     };
 
     const quiz = new Quiz(quizInfos);
