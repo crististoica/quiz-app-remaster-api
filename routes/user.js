@@ -7,7 +7,7 @@ import {
   changeProfileImg,
 } from "../controllers/user/user.js";
 import { checkUserToken } from "../middleware/auth.js";
-import { uploadProfileImage, uploadQuizImage } from "../fileUpload.js";
+import { uploadProfileImage } from "../fileUpload.js";
 
 const router = express.Router();
 
