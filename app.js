@@ -1,14 +1,11 @@
-import fs from "fs";
-import { v4 as uuid4 } from "uuid";
+const arr = [{ name: "UNU" }, { name: "DOI" }];
 
-// const rawdata = fs.readFileSync("./data-remaster-v2.json");
-// const data = JSON.parse(rawdata);
+function addEmail(arr) {
+  arr[0] = { surname: " DOUZEZCI" };
+  arr.forEach((entry) => (entry.email = "new_EMAIL"));
+}
+console.log(arr);
 
-// Object.keys(data).forEach((key) => {
-//   data[key].forEach((entry) => {
-//     entry.id = uuid4();
-//   });
-// });
+addEmail(arr);
 
-// const newData = JSON.stringify(data);
-// fs.writeFileSync("./data-remaster-v3.json", newData, "utf8");
+console.log(arr);

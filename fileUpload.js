@@ -7,7 +7,6 @@ const topicStorage = multer.diskStorage({
     next(null, "./public/uploads/topics");
   },
   filename: (req, file, next) => {
-    console.log(file);
     next(
       null,
       file.fieldname + "-" + uuid4() + path.extname(file.originalname)
@@ -27,11 +26,24 @@ const quizStorage = multer.diskStorage({
   },
 });
 
-const checkImage = (file, next) => {
-  const fileTypes = /jpeg|jpg|png|/;
+const profileImageStorage = multer.diskStorage({
+  destination: (req, file, next) => {
+    next(null, "./public/uploads/profiles");
+  },
+  filename: (req, file, next) => {
+    const userId = req.userData._id;
+    next(
+      null,
+      file.fieldname + "-" + uuid4() + path.extname(file.originalname)
+    );
+  },
+});
 
-  const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimeType = fileTypes.test(file.mimetype);
+const checkImage = (file, next) => {
+  const filetypes = /jpeg|jpg|png|gif/;
+
+  const extName = filetypes.test(path.extname(file.originalname).toLowerCase());
+  const mimeType = filetypes.test(file.mimetype);
 
   if (extName && mimeType) {
     return next(null, true);
@@ -53,6 +65,17 @@ export const uploadTopicImage = multer({
 
 export const uploadQuizImage = multer({
   storage: quizStorage,
+  limits: {
+    fileSize: 1024 * 1024 * 10,
+    files: 1,
+  },
+  fileFilter: (req, file, next) => {
+    checkImage(file, next);
+  },
+});
+
+export const uploadProfileImage = multer({
+  storage: profileImageStorage,
   limits: {
     fileSize: 1024 * 1024 * 10,
     files: 1,
