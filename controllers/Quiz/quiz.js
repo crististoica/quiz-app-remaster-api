@@ -70,7 +70,6 @@ export const verifyQuiz = async (req, res, next) => {
 
     res.json({ result: gradeQuiz(quiz.questions, userQuizData), topic });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
