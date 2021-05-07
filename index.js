@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 
 import { notFound, errorHandler } from "./errorHandler.js";
 import { checkUserToken, checkAdminToken } from "./middleware/auth.js";
+
 import userRouter from "./routes/user.js";
 import quizRouter from "./routes/quiz.js";
 import adminRouter from "./routes/admin.js";
