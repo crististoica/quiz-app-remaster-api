@@ -4,7 +4,6 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
 
 import { notFound, errorHandler } from "./errorHandler.js";
 import { checkUserToken, checkAdminToken } from "./middleware/auth.js";
@@ -15,16 +14,6 @@ import adminRouter from "./routes/admin.js";
 import communityRouter from "./routes/community.js";
 
 const app = express();
-const userLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
-  message: {
-    message: {
-      content: "Too many requests. Try again in 15 minutes.",
-      type: "error",
-    },
-  },
-});
 
 dotenv.config();
 
@@ -44,7 +33,7 @@ await mongoose.connect(process.env.MONGO_URL, {
   useCreateIndex: true,
 });
 
-app.use("/user", userLimiter, userRouter);
+app.use("/user", userRouter);
 app.use("/quiz", checkUserToken, quizRouter);
 app.use("/community", checkUserToken, communityRouter);
 app.use("/admin", checkAdminToken, adminRouter);
