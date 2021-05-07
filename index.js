@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-//import morgan from "morgan";
+import morgan from "morgan";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
@@ -30,7 +30,7 @@ dotenv.config();
 
 app.use(helmet());
 app.use(cors());
-//app.use(morgan("dev"));
+app.use(morgan("dev"));
 app.use(express.json({ extended: true, limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
