@@ -5,7 +5,7 @@ import {
   removeTopic,
   toggleTopicLock,
   updateTopic,
-} from "../controllers/Admin/community.js";
+} from "../controllers/admin/community.js";
 import { createQuiz } from "../controllers/admin/quizes.js";
 import { uploadTopicImage, uploadQuizImage } from "../fileUpload.js";
 
