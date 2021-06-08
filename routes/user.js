@@ -26,7 +26,7 @@ const registerLimit = rateLimit({
 
 router.get("/check-token", checkUserToken, checkToken);
 
-// router.post("/signup", registerLimit, signup);
+router.post("/signup", registerLimit, signup);
 router.post("/signin", signin);
 router.post("/guest-signin", guestSignIn);
 

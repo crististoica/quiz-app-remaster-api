@@ -122,7 +122,7 @@ export const guestSignIn = async (req, res, next) => {
   try {
     const user = await User.find({ isGuest: true });
     const index = Math.floor(Math.random() * user.length);
-    const existingUser = user[0];
+    const existingUser = user[index];
     const token = jwt.sign(
       {
         _id: existingUser._id,
