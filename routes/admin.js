@@ -5,6 +5,7 @@ import {
   removeTopic,
   toggleTopicLock,
   updateTopic,
+  removeAllGuestRelated,
 } from "../controllers/admin/community.js";
 import { createQuiz } from "../controllers/admin/quizes.js";
 import { uploadTopicImage, uploadQuizImage } from "../fileUpload.js";
@@ -17,6 +18,7 @@ router.post(
   uploadTopicImage.single("img"),
   createTopic
 );
+router.get("/remove-guest-related", removeAllGuestRelated);
 
 router.delete("/topics/remove-topic/:topicId", removeTopic);
 

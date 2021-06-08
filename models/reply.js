@@ -5,6 +5,7 @@ export const ReplySchema = mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name: String,
     profileImg: String,
+    isGuest: Boolean,
   },
   createdOn: Date,
   content: String,

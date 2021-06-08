@@ -96,3 +96,20 @@ export const updateTopic = async (req, res, next) => {
   //   next(error);
   // }
 };
+
+export const removeAllGuestRelated = async (req, res, next) => {
+  try {
+    const posts = await Post.find({ "author.isGuest": true });
+    const postsIds = posts.map((post) => post._id);
+
+    await Post.deleteMany({ "author.isGuest": true });
+    await Post.updateMany({ $pull: { replies: { "author.isGuest": true } } });
+    await Topic.updateMany({
+      $pull: { posts: { _id: { $in: postsIds } } },
+    });
+    //await Topic.updateMany({ "posts._id": { $in: postsIds } });
+    res.json({ message: "Topics and Posts made by Guest users removed." });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -11,6 +11,10 @@ const userSchema = mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isGuest: {
+    type: Boolean,
+    default: true,
+  },
   email: String,
   password: String,
 });

@@ -53,6 +53,7 @@ export const createNormalPost = async (req, res, next) => {
       _id: userData._id,
       name: userData.firstName + " " + userData.lastName,
       profileImg: userData.profileImg,
+      isGuest: userData.isGuest,
     },
     createdOn: Date.now(),
     slug: slugify(req.body.title, {
@@ -147,6 +148,7 @@ export const createReply = async (req, res, next) => {
       _id: userData._id,
       name: userData.firstName + " " + userData.lastName,
       profileImg: userData.profileImg,
+      isGuest: userData.isGuest,
     },
     createdOn: Date.now(),
   };
@@ -183,11 +185,12 @@ export const createQuizPost = async (req, res, next) => {
       _id: userData._id,
       name: userData.firstName + " " + userData.lastName,
       profileImg: userData.profileImg,
+      isGuest: userData.isGuest,
     },
     createdOn: Date.now(),
     content: req.body.content,
   };
-  console.log(questionId);
+
   try {
     if (postInfos.content.length < 10) {
       throw new Error("Post content must be at least 10 chars long.");

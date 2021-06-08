@@ -23,6 +23,7 @@ export const checkUserToken = (req, res, next) => {
         lastName: decoded.lastName,
         profileImg: decoded.profileImg,
         isAdmin: decoded.isAdmin,
+        isGuest: decoded.isGuest,
       };
 
       return next();
