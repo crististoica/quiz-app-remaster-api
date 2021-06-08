@@ -107,7 +107,6 @@ export const removeAllGuestRelated = async (req, res, next) => {
     await Topic.updateMany({
       $pull: { posts: { _id: { $in: postsIds } } },
     });
-    //await Topic.updateMany({ "posts._id": { $in: postsIds } });
     res.json({ message: "Topics and Posts made by Guest users removed." });
   } catch (error) {
     next(error);
