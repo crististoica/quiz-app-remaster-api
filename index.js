@@ -4,6 +4,7 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
+import compression from "compression";
 
 import { notFound, errorHandler } from "./errorHandler.js";
 import { checkUserToken, checkAdminToken } from "./middleware/auth.js";
@@ -19,7 +20,8 @@ dotenv.config();
 
 app.use(helmet());
 app.use(cors());
-app.use(morgan("dev"));
+app.use(morgan("tiny"));
+app.use(compression());
 app.use(express.json({ extended: true, limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));

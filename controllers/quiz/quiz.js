@@ -1,24 +1,10 @@
 import fs from "fs";
-import mongoose from "mongoose";
 
 import Quiz from "../../models/quiz.js";
 import Topic from "../../models/topic.js";
-import { generateQuiz, generateRealTest, gradeQuiz } from "./helpers.js";
+import { generateQuiz, gradeQuiz } from "./helpers.js";
 
 const FILE_URL = "./data-remaster-v3.json";
-
-const getCourseKey = (course) => {
-  switch (course.toLowerCase()) {
-    case "java":
-      return "POO";
-    case "networks":
-      return "RET";
-    case "databases":
-      return "BD";
-    default:
-      return null;
-  }
-};
 
 export const getQuiz = async (req, res, next) => {
   const quizId = req.params.quizId;
@@ -35,18 +21,6 @@ export const getQuiz = async (req, res, next) => {
     }
 
     const quizQuestions = generateQuiz(quiz.questions, quiz.numOfQuestions);
-    // fs.readFile(FILE_URL, (error, data) => {
-    //   if (error) throw error;
-    //   const questionsArr = JSON.parse(data);
-    //   if (key) {
-    //     const questions = questionsArr[key];
-    //     return res.json({
-    //       key: key,
-    //       quiz: {
-    //         [key]: generateQuiz(questions),
-    //       },
-    //     });
-    //   }
 
     res.json({
       quiz: {
@@ -115,12 +89,8 @@ export const moveData = async (req, res, next) => {
     });
     const quiz = await Quiz.findById("6076b6397d62ec2ac41c40b6");
     quiz.questions = data["RET"];
-    const finalQuiz = await Quiz.findByIdAndUpdate(
-      "6076b6397d62ec2ac41c40b6",
-      quiz
-    );
-    // console.log(quiz.questions[1]);
-    // quiz.questions.forEach((question) => (question.newProperty = "TEEEEST"));
+    await Quiz.findByIdAndUpdate("6076b6397d62ec2ac41c40b6", quiz);
+
     res.json(quiz.questions);
   } catch (error) {
     next(error);
