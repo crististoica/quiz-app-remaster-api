@@ -47,6 +47,12 @@ app.use("/admin", checkAdminToken, adminRouter);
 app.use(notFound);
 app.use(errorHandler);
 
+app.get("/test", (req, res) => {
+  res.json({
+    message: "TEST",
+  });
+});
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
