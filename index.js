@@ -19,11 +19,7 @@ const app = express();
 dotenv.config();
 
 app.use(helmet());
-app.use(
-  cors({
-    origin: "https://quiz-client-remaster.vercel.app/",
-  })
-);
+app.use(cors());
 app.use(morgan("tiny"));
 app.use(compression());
 app.use(express.json({ extended: true, limit: "2mb" }));
@@ -43,12 +39,6 @@ app.use("/user", userRouter);
 app.use("/quiz", checkUserToken, quizRouter);
 app.use("/community", checkUserToken, communityRouter);
 app.use("/admin", checkAdminToken, adminRouter);
-
-app.get("/test", (req, res) => {
-  res.json({
-    message: "TEST",
-  });
-});
 
 app.use(notFound);
 app.use(errorHandler);
