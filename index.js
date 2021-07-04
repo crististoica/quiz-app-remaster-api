@@ -44,14 +44,14 @@ app.use("/quiz", checkUserToken, quizRouter);
 app.use("/community", checkUserToken, communityRouter);
 app.use("/admin", checkAdminToken, adminRouter);
 
-app.use(notFound);
-app.use(errorHandler);
-
 app.get("/test", (req, res) => {
   res.json({
     message: "TEST",
   });
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
