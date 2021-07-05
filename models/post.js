@@ -23,6 +23,10 @@ const PostSchema = mongoose.Schema({
     isGuest: Boolean,
   },
   createdOn: Date,
+  isClosed: {
+    type: Boolean,
+    default: false,
+  },
   replies: [ReplySchema],
 });
 

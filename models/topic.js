@@ -26,6 +26,7 @@ const TopicSchema = mongoose.Schema({
       slug: String,
       title: String,
       createdOn: Date,
+      isClosed: Boolean,
     },
   ],
 });

@@ -29,7 +29,10 @@ export const getOnePost = async (req, res, next) => {
   const { topicSlug, postSlug } = req.params;
 
   try {
-    const post = await Post.findOne({ slug: postSlug });
+    const post = await Post.findOne({
+      $and: [{ slug: postSlug }, { "topic.slug": topicSlug }],
+    });
+
     const topic = await Topic.findOne({ slug: topicSlug });
     if (!post) {
       return res.json({ post: null });
@@ -63,19 +66,6 @@ export const createNormalPost = async (req, res, next) => {
   };
 
   try {
-    if (postInfos.questionContent) {
-      const quiz = await Quiz.findById(quizId);
-
-      if (!quiz) {
-        throw new Error("This quiz does not exist.");
-      }
-
-      const question = quiz.questions.find((q) => q._id === questionId);
-      if (!question) {
-        throw new Error("This question does not exist.");
-      }
-    }
-
     if (postInfos.title.length < 4) {
       throw new Error("Post title must be at least 4 chars long.");
     }
@@ -103,7 +93,6 @@ export const createNormalPost = async (req, res, next) => {
     }
 
     const post = new Post(postInfos);
-
     const topic = await Topic.findByIdAndUpdate(
       postInfos.topicId,
       {
@@ -118,6 +107,7 @@ export const createNormalPost = async (req, res, next) => {
             title: postInfos.title,
             slug: postInfos.slug,
             createdOn: Date.now(),
+            isClosed: post.isClosed,
           },
         },
       },
@@ -165,6 +155,9 @@ export const createReply = async (req, res, next) => {
 
     if (!post) {
       throw new Error("This post does not exist.");
+    }
+    if (post.isClosed) {
+      throw new Error("This post is marked as answered. Replies are disabled.");
     }
 
     res.json({
@@ -249,6 +242,7 @@ export const createQuizPost = async (req, res, next) => {
             title: postInfos.title,
             slug: postInfos.slug,
             createdOn: Date.now(),
+            isClosed: post.isClosed,
           },
         },
       },
@@ -264,6 +258,42 @@ export const createQuizPost = async (req, res, next) => {
     res.json({
       topic,
       message: "Post Created.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const setPostStatus = async (req, res, next) => {
+  const { _id: userId } = req.userData;
+  const { topicSlug, postSlug } = req.params;
+
+  try {
+    const post = await Post.findOne({
+      $and: [{ slug: postSlug }, { "topic.slug": topicSlug }],
+    });
+    if (!post) {
+      throw new Error("This post does not exists.");
+    }
+    if (post.author._id.toString() !== userId) {
+      throw new Error("You are not the creator of this post.");
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      post._id,
+      { isClosed: !post.isClosed },
+      { new: true }
+    );
+    await Topic.findOneAndUpdate(
+      { _id: post.topic._id, "posts._id": post._id },
+      { $set: { "posts.$.isClosed": !post.isClosed } }
+    );
+    const message = post.isClosed
+      ? "Post marked as not answered. Replies are enabled"
+      : "Post marked as answered. Replies are disabled.";
+    res.json({
+      post: updatedPost,
+      message: message,
     });
   } catch (error) {
     next(error);
